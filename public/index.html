@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Prices</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    table {
+      width: 50%;
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+    }
+    h1 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Real-Time Stock Prices</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Stock</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody id="stock-prices">
+      <!-- Stock data will be inserted here -->
+    </tbody>
+  </table>
+
+  <script>
+    // Create a new EventSource to listen to the /stocks endpoint
+    const eventSource = new EventSource('http://localhost:3000/stocks');
+
+
+    eventSource.onmessage = function(event) {
+      // Parse the JSON data received
+      const stocks = JSON.parse(event.data);
+      const stockTableBody = document.getElementById('stock-prices');
+      
+      // Clear existing table rows
+      stockTableBody.innerHTML = '';
+
+      // Populate table with updated stock prices
+      for (const [stock, price] of Object.entries(stocks)) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${stock}</td><td>${price.toFixed(2)}</td>`;
+        stockTableBody.appendChild(row);
+      }
+    };
+
+    eventSource.onerror = function(error) {
+      console.error("EventSource failed:", error);
+    };
+  </script>
+
+</body>
+</html>
